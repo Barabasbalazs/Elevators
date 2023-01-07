@@ -85,41 +85,49 @@ const ElevatorApp = () => {
 
   const elavatorButtonPush = async (side, floorPos, buttonClicked) => {
     if (side === 'left') {
-      if (buttonClicked > left) {
-        for (let i = left; i <= buttonClicked; i++) {
-          setTimeout(() => {
-            setLeft(i);
-            changeLeft(i);
-          }, 1000 * i);
-        }
-      } else if (buttonClicked < left) {
-        const div = (left - buttonClicked);
-        for (let i = 0; i <= div; i++) {
-          setTimeout(() => {
-            setLeft(left - i);
-            changeLeft(left - i); 
-          }, 1000 * i);
-        }
-      }
+      moveLeft(buttonClicked);
     } else if (side === 'right') {
-      if (buttonClicked > right) {
-        for (let i = right; i <= buttonClicked; i++) {
-          setTimeout(() => {
-            setRight(i);
-            changeRight(i);
-          }, 1000 * i);
-        }
-      } else if (buttonClicked < right) {
-        const div = (right - buttonClicked);
-        for (let i = 0; i <= div; i++) {
-          setTimeout(() => {
-            setRight(right - i);
-            changeRight(right - i); 
-          }, 1000 * i);
-        }
-      }
+      moveRight(buttonClicked);
     }
   } 
+
+  const moveLeft = (wishedFloor) => {
+    if (wishedFloor > left) {
+      for (let i = left; i <= wishedFloor; i++) {
+        setTimeout(() => {
+          setLeft(i);
+          changeLeft(i);
+        }, 1000 * i);
+      }
+    } else if (wishedFloor < left) {
+      const div = (left - wishedFloor);
+      for (let i = 0; i <= div; i++) {
+        setTimeout(() => {
+          setLeft(left - i);
+          changeLeft(left - i); 
+        }, 1000 * i);
+      }
+    }
+  }
+  
+  const moveRight = (wishedFloor) => {
+    if (wishedFloor > right) {
+      for (let i = right; i <= wishedFloor; i++) {
+        setTimeout(() => {
+          setRight(i);
+          changeRight(i);
+        }, 1000 * i);
+      }
+    } else if (wishedFloor < right) {
+      const div = (right - wishedFloor);
+      for (let i = 0; i <= div; i++) {
+        setTimeout(() => {
+          setRight(right - i);
+          changeRight(right - i); 
+        }, 1000 * i);
+      }
+    }
+  }
   
   const calculateClosest = (floorNumber) => {
     if (Math.abs(left - floorNumber) < Math.abs(right - floorNumber)) {
@@ -137,11 +145,9 @@ const ElevatorApp = () => {
 
   const floorButtonPush = (floorNumber, buttonClicked) => {
     if (calculateClosest(floorNumber) === 'left') {
-      setLeft(floorNumber);
-      changeLeft(floorNumber);
+      moveLeft(floorNumber);
     } else {
-      setRight(floorNumber);
-      changeRight(floorNumber);
+      moveRight(floorNumber);
     }
   }
 
