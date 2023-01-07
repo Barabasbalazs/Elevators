@@ -14,6 +14,12 @@ const ElevatorComp = (props) => {
                 return <Button key={index} value={index} onClick={buttonClicked}>{index}</Button>;
                 })
             }
+            <div className="flex space-x-2">
+                <p className="text-l">Heading to: </p>
+                {props.list.map((el) => {
+                    return <p> {el} </p>;   
+                })}
+            </div>    
         </div> 
     );
 }

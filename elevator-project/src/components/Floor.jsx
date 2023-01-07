@@ -22,6 +22,7 @@ const Floor = (props) => {
                 <ElevatorComp floors={floors} side={'left'}
                     currentFloor={props.index}
                     buttonClickCallback={props.elevatorCallBack}
+                    list={props.floorSituation.headingToLeft}
                 />    
             }
             </div>
@@ -30,7 +31,8 @@ const Floor = (props) => {
                  <ElevatorComp floors={floors} side={'right'}
                     currentFloor={props.index}
                     buttonClickCallback={props.elevatorCallBack}
-                 />    
+                    list={props.floorSituation.headingToRight}
+                 />
             }
             </div>
         </div>

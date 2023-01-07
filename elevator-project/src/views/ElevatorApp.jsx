@@ -10,6 +10,7 @@ const ElevatorApp = () => {
     {
       left: true,
       right: false,
+      headingToLeft: []
     },
     {
       left: false,
@@ -34,20 +35,29 @@ const ElevatorApp = () => {
     {
       left: false,
       right: true,
+      headingToRight: []
     }
   ])
 
-  const [left, setLeft] = useState(0)
+  const [left, setLeft] = useState({
+    pos: 0,
+    headingTo: [6, 1]
+  })
 
-  const [right, setRight] = useState(6)
+  const [right, setRight] = useState({
+    pos: 6,
+    headingTo: [5,6]
+  })
 
   const changeLeft = (buttonClicked) => {
+    const prevLeft = left;
     setFloorStates((prevFloorStates) => {
       const newFloorState = prevFloorStates.map((el, ind) => {
         if (ind === parseInt(buttonClicked)) {
           return {
             left: true,
-            right: el.right
+            headingToLeft: prevLeft.headingTo,
+            right: el.right,
           };
         } else if (el.left === true) {
           return {
@@ -63,11 +73,13 @@ const ElevatorApp = () => {
   }
 
   const changeRight = (buttonClicked) => {
+    const prevRight = right;
     setFloorStates((prevFloorStates) => {
       const newFloorState = prevFloorStates.map((el, ind) => {
         if (ind === parseInt(buttonClicked)) {
           return {
             left: el.left,
+            headingToRight: prevRight.headingTo,
             right: true
           };
         } else if (el.right === true) {
@@ -92,52 +104,60 @@ const ElevatorApp = () => {
   } 
 
   const moveLeft = (wishedFloor) => {
-    if (wishedFloor > left) {
-      for (let i = left; i <= wishedFloor; i++) {
+    if (wishedFloor > left.pos) {
+      for (let i = left.pos; i <= wishedFloor; i++) {
         setTimeout(() => {
-          setLeft(i);
+          setLeft({
+            pos: i
+          });
           changeLeft(i);
         }, 1000 * i);
       }
     } else if (wishedFloor < left) {
-      const div = (left - wishedFloor);
+      const div = (left.pos - wishedFloor);
       for (let i = 0; i <= div; i++) {
         setTimeout(() => {
-          setLeft(left - i);
-          changeLeft(left - i); 
+          setLeft({
+            pos: left.pos - i
+          });
+          changeLeft(left.pos - i); 
         }, 1000 * i);
       }
     }
   }
   
   const moveRight = (wishedFloor) => {
-    if (wishedFloor > right) {
-      for (let i = right; i <= wishedFloor; i++) {
+    if (wishedFloor > right.pos) {
+      for (let i = right.pos; i <= wishedFloor; i++) {
         setTimeout(() => {
-          setRight(i);
+          setRight({
+            pos: i
+          });
           changeRight(i);
         }, 1000 * i);
       }
-    } else if (wishedFloor < right) {
-      const div = (right - wishedFloor);
+    } else if (wishedFloor < right.pos) {
+      const div = (right.pos - wishedFloor);
       for (let i = 0; i <= div; i++) {
         setTimeout(() => {
-          setRight(right - i);
-          changeRight(right - i); 
+          setRight({
+            pos: right.pos - i
+          });
+          changeRight(right.pos - i); 
         }, 1000 * i);
       }
     }
   }
   
   const calculateClosest = (floorNumber) => {
-    if (Math.abs(left - floorNumber) < Math.abs(right - floorNumber)) {
+    if (Math.abs(left.pos - floorNumber) < Math.abs(right.pos - floorNumber)) {
       return 'left';
-    } else if (Math.abs(left - floorNumber) > Math.abs(right - floorNumber)) {
+    } else if (Math.abs(left.pos - floorNumber) > Math.abs(right.pos - floorNumber)) {
       return 'right';
-    } else if (Math.abs(left - floorNumber) > Math.abs(right - floorNumber)) {
-      if (left < floorNumber) {
+    } else if (Math.abs(left.pos - floorNumber) > Math.abs(right.pos - floorNumber)) {
+      if (left.pos < floorNumber) {
         return 'left';
-      } else if (right < floorNumber) {
+      } else if (right.pos < floorNumber) {
         return 'right';
       }
     }
