@@ -10,6 +10,10 @@ const Floor = (props) => {
         props.floorCallBack(props.index, e.target.value);
     }
 
+    if (props.floorSituation.left && props.floorSituation.right) {
+        console.log(`${props.index} : ${props.floorSituation.headingToLeft} - ${props.floorSituation.headingToRight}`)
+    }
+
     return (
         <div className="h-1/6 text-left grid grid-cols-3 divide-x items-center border-t-4 space-x-2">
             <div className="grid grid-cols items-center space-y-1">
@@ -19,7 +23,9 @@ const Floor = (props) => {
             </div>
             <div className="h-full w-full">
             {props.floorSituation.left && 
-                <ElevatorComp floors={floors} side={'left'}
+                <ElevatorComp 
+                    floors={floors} 
+                    side={'left'}
                     currentFloor={props.index}
                     buttonClickCallback={props.elevatorCallBack}
                     list={props.floorSituation.headingToLeft}
@@ -28,7 +34,9 @@ const Floor = (props) => {
             </div>
             <div className="h-full w-full border-l-4">
             {props.floorSituation.right && 
-                 <ElevatorComp floors={floors} side={'right'}
+                 <ElevatorComp 
+                    floors={floors} 
+                    side={'right'}
                     currentFloor={props.index}
                     buttonClickCallback={props.elevatorCallBack}
                     list={props.floorSituation.headingToRight}

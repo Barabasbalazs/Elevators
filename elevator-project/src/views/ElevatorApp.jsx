@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 import Floor from '../components/Floor'
 import '../styles/ElevatorApp.css'
+import { Queue } from '../utils/queue'
 
 const ElevatorApp = () => {
 
-  const [floors, setFloors] = useState([6, 5, 4, 3, 2, 1, 0])
+  const [floors] = useState([6, 5, 4, 3, 2, 1, 0])
 
   const [floorStates, setFloorStates] = useState([
     {
       left: true,
       right: false,
-      headingToLeft: []
+      headingToLeft: new Queue()
     },
     {
       left: false,
@@ -35,119 +36,123 @@ const ElevatorApp = () => {
     {
       left: false,
       right: true,
-      headingToRight: []
+      headingToRight: new Queue()
     }
   ])
 
-  const [left, setLeft] = useState({
-    pos: 0
-  })
+  const [left, setLeftElevator] = useState(0)
 
-  const [right, setRight] = useState({
-    pos: 6
-  })
+  const [right, setRightElevator] = useState(6)
 
-  const [leftHeading, setLeftHeading] = useState([])
+  const [leftHeading, setLeftHeading] = useState(new Queue());
 
-  const [rightHeading, setRightHeading] = useState([])
+  const [rightHeading, setRightHeading] = useState(new Queue());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+
+      if (leftHeading.isEmpty()) {
+        console.log('it is empty')
+        return;
+      }
+
+      const leftHNum = parseInt(leftHeading.peek());
+
+      console.log(`left: ${left} - leftHNum ${leftHNum}`);
+
+      if (left === leftHNum) {
+        console.log('stepped into equal')
+        setLeftHeading((prev) => {
+          prev.dequeue();
+          const newQueue = prev;
+          return newQueue;  
+        });
+        return;
+      }
+
+      if (left < leftHNum) {
+        setLeftElevator(left + 1, moveLeftElevator(left + 1)); // sets the position of the left one
+      } else {
+        setLeftElevator(left - 1, moveLeftElevator(left - 1)); // sets the position of the right,
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [left, leftHeading]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+
+      if (rightHeading.isEmpty()) {
+        return;
+      }
+
+      const rightHNum = parseInt(rightHeading.peek());
+
+      if (right === rightHNum) {
+        // console.log('stepped into equal')
+        setRightHeading((prev) => {
+          prev.dequeue();
+          const newQueue = prev;
+          return newQueue;  
+        });
+        return;
+      }
+
+      if (right < rightHNum) {
+        setRightElevator(right + 1, moveRightElevator(right + 1)); // sets the position of the left one
+
+      } else {
+        setRightElevator(right - 1, moveRightElevator(right - 1)); // sets the position of the right,
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [right, rightHeading]);
 
   // changes the states of the floors so the elevator moves
-  const changeLeft = (buttonClicked) => {
-    setFloorStates((prevFloorStates) => {
-      const newFloorState = prevFloorStates.map((el, ind) => {
-        if (ind === parseInt(buttonClicked)) {
+  const moveLeftElevator = (destFloor) => {
+    setFloorStates((prev) => {
+      const newFloors = prev.map((el, ind) => {
+        if (ind === parseInt(destFloor)) {
           return {
             left: true,
             headingToLeft: leftHeading,
-            right: el.right,
-          };
-        } else if (el.headingToLeft) {
+            headingToRight: el.headingToRight,
+            right: el.right
+          }
+        } else {
           return {
             left: false,
+            headingToRight: el.headingToRight,
             right: el.right
-          };
-        } else {
-          return el;
+          }
         }
       })
-      return newFloorState;
-    })
+      return newFloors;
+    });
   }
 
-  const changeRight = (buttonClicked) => {
-    setFloorStates((prevFloorStates) => {
-      const newFloorState = prevFloorStates.map((el, ind) => {
-        if (ind === parseInt(buttonClicked)) {
+  const moveRightElevator = (destFloor) => {
+    setFloorStates((prev) => {
+      const newFloors = prev.map((el, ind) => {
+        if (ind === parseInt(destFloor)) {
           return {
-            left: el.left,
+            right: true,
+            headingToLeft: el.headingToLeft,
             headingToRight: rightHeading,
-            right: true
-          };
-        } else if (el.headingToRight) {
-          return {
-            left: el.left,
-            right: false
-          };
+            left: el.left
+          }
         } else {
-          return el;
+          return {
+            right: false,
+            headingToLeft: el.headingToLeft,
+            left: el.left
+          }
         }
       })
-      return newFloorState;
-    })
-  }
-
-  const moveLeft = (wishedFloor) => {
-    if (wishedFloor > left.pos) {
-      for (let i = left.pos; i <= wishedFloor; i++) {
-        setTimeout(() => {
-          setLeft((prev) => { 
-            return { 
-              pos: i
-            }
-          });
-          changeLeft(i);
-        }, 1000 * i);
-      }
-    } else if (wishedFloor < left) {
-      const div = (left.pos - wishedFloor);
-      for (let i = 0; i <= div; i++) {
-        setTimeout(() => {
-          setLeft((prev) => { 
-            return { 
-              pos: i,
-            }
-          });
-          changeLeft(left.pos - i); 
-        }, 1000 * i);
-      }
-    }
-  }
-  
-  const moveRight = (wishedFloor) => {
-    if (wishedFloor > right.pos) {
-      for (let i = right.pos; i <= wishedFloor; i++) {
-        setTimeout(() => {
-          setRight((prev) => { 
-            return { 
-              pos: i
-            }
-          });
-          changeRight(i);
-        }, 1000 * i);
-      }
-    } else if (wishedFloor < right.pos) {
-      const div = (right.pos - wishedFloor);
-      for (let i = 0; i <= div; i++) {
-        setTimeout(() => {
-          setRight((prev) => { 
-            return { 
-              pos: i,
-            }
-          });
-          changeRight(right.pos - i); 
-        }, 1000 * i);
-      }
-    }
+      return newFloors;
+    });
   }
   
   const calculateClosest = (floorNumber) => {
@@ -166,36 +171,22 @@ const ElevatorApp = () => {
 
   const elavatorButtonPush = async (side, buttonClicked) => {
     if (side === 'left') {
-      Promise.resolve(setLeftHeading((prev) => {
-        const heading = prev;
-        heading.push(buttonClicked);
-        return heading;
-      })).then(moveLeft(buttonClicked));
+      setLeftHeading((prev) => {
+        prev.enqueue(buttonClicked);
+        const newH = prev;
+        return newH;
+      }); // => this fires of the changeing of the pos and the queue
     } else if (side === 'right') {
-      Promise.resolve(setRightHeading((prev) => {
-        const heading = prev;
-        heading.push(buttonClicked);
-        return heading;
-      })).then(moveRight(buttonClicked));
+      setRightHeading((prev) => {
+        prev.enqueue(buttonClicked);
+        const newH = prev;
+        return newH;
+      });
     }
   } 
-
-  const floorButtonPush = (floorNumber, buttonClicked) => {
-    if (calculateClosest(floorNumber) === 'left') {
-      setLeftHeading((prev) => {
-        const heading = prev;
-        heading.push(floorNumber);
-        return heading;
-      })
-      moveLeft(floorNumber);
-    } else {
-      setRightHeading((prev) => {
-        const heading = prev;
-        heading.push(floorNumber);
-        return heading;
-      })
-      moveRight(floorNumber);
-    }
+  
+  const floorButtonPush = () => {
+    console.log('Floorbuttonpush');
   }
 
   return (
