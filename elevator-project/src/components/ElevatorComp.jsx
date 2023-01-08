@@ -5,7 +5,7 @@ const ElevatorComp = (props) => {
     // console.log(`${props.side} here and i'm currently on ${props.currentFloor}`);
 
     const buttonClicked = (e) => {
-        props.buttonClickCallback(props.side, props.currentFloor, e.target.value);
+        props.buttonClickCallback(props.side, e.target.value);
     }
 
     return (

@@ -40,26 +40,28 @@ const ElevatorApp = () => {
   ])
 
   const [left, setLeft] = useState({
-    pos: 0,
-    headingTo: [6, 1]
+    pos: 0
   })
 
   const [right, setRight] = useState({
-    pos: 6,
-    headingTo: [5,6]
+    pos: 6
   })
 
+  const [leftHeading, setLeftHeading] = useState([])
+
+  const [rightHeading, setRightHeading] = useState([])
+
+  // changes the states of the floors so the elevator moves
   const changeLeft = (buttonClicked) => {
-    const prevLeft = left;
     setFloorStates((prevFloorStates) => {
       const newFloorState = prevFloorStates.map((el, ind) => {
         if (ind === parseInt(buttonClicked)) {
           return {
             left: true,
-            headingToLeft: prevLeft.headingTo,
+            headingToLeft: leftHeading,
             right: el.right,
           };
-        } else if (el.left === true) {
+        } else if (el.headingToLeft) {
           return {
             left: false,
             right: el.right
@@ -73,16 +75,15 @@ const ElevatorApp = () => {
   }
 
   const changeRight = (buttonClicked) => {
-    const prevRight = right;
     setFloorStates((prevFloorStates) => {
       const newFloorState = prevFloorStates.map((el, ind) => {
         if (ind === parseInt(buttonClicked)) {
           return {
             left: el.left,
-            headingToRight: prevRight.headingTo,
+            headingToRight: rightHeading,
             right: true
           };
-        } else if (el.right === true) {
+        } else if (el.headingToRight) {
           return {
             left: el.left,
             right: false
@@ -95,20 +96,14 @@ const ElevatorApp = () => {
     })
   }
 
-  const elavatorButtonPush = async (side, floorPos, buttonClicked) => {
-    if (side === 'left') {
-      moveLeft(buttonClicked);
-    } else if (side === 'right') {
-      moveRight(buttonClicked);
-    }
-  } 
-
   const moveLeft = (wishedFloor) => {
     if (wishedFloor > left.pos) {
       for (let i = left.pos; i <= wishedFloor; i++) {
         setTimeout(() => {
-          setLeft({
-            pos: i
+          setLeft((prev) => { 
+            return { 
+              pos: i
+            }
           });
           changeLeft(i);
         }, 1000 * i);
@@ -117,8 +112,10 @@ const ElevatorApp = () => {
       const div = (left.pos - wishedFloor);
       for (let i = 0; i <= div; i++) {
         setTimeout(() => {
-          setLeft({
-            pos: left.pos - i
+          setLeft((prev) => { 
+            return { 
+              pos: i,
+            }
           });
           changeLeft(left.pos - i); 
         }, 1000 * i);
@@ -130,8 +127,10 @@ const ElevatorApp = () => {
     if (wishedFloor > right.pos) {
       for (let i = right.pos; i <= wishedFloor; i++) {
         setTimeout(() => {
-          setRight({
-            pos: i
+          setRight((prev) => { 
+            return { 
+              pos: i
+            }
           });
           changeRight(i);
         }, 1000 * i);
@@ -140,8 +139,10 @@ const ElevatorApp = () => {
       const div = (right.pos - wishedFloor);
       for (let i = 0; i <= div; i++) {
         setTimeout(() => {
-          setRight({
-            pos: right.pos - i
+          setRight((prev) => { 
+            return { 
+              pos: i,
+            }
           });
           changeRight(right.pos - i); 
         }, 1000 * i);
@@ -163,10 +164,36 @@ const ElevatorApp = () => {
     }
   }
 
+  const elavatorButtonPush = async (side, buttonClicked) => {
+    if (side === 'left') {
+      Promise.resolve(setLeftHeading((prev) => {
+        const heading = prev;
+        heading.push(buttonClicked);
+        return heading;
+      })).then(moveLeft(buttonClicked));
+    } else if (side === 'right') {
+      Promise.resolve(setRightHeading((prev) => {
+        const heading = prev;
+        heading.push(buttonClicked);
+        return heading;
+      })).then(moveRight(buttonClicked));
+    }
+  } 
+
   const floorButtonPush = (floorNumber, buttonClicked) => {
     if (calculateClosest(floorNumber) === 'left') {
+      setLeftHeading((prev) => {
+        const heading = prev;
+        heading.push(floorNumber);
+        return heading;
+      })
       moveLeft(floorNumber);
     } else {
+      setRightHeading((prev) => {
+        const heading = prev;
+        heading.push(floorNumber);
+        return heading;
+      })
       moveRight(floorNumber);
     }
   }
