@@ -165,12 +165,21 @@ const ElevatorApp = () => {
   }
 
   const elavatorButtonPush = async (side, buttonClicked) => {
+    // need to shift it a little
     // if its greater or smaller than the destination and headed in that direction it will not ad it to the queue
     if (side === 'left') {
-      if (buttonClicked > left && buttonClicked <= leftHeading.peek()) {
-        return;
-      } else if (buttonClicked < left && buttonClicked >= leftHeading.peek()) {
-        return;
+      if (buttonClicked > left && buttonClicked <= parseInt(leftHeading.peek())) {
+        setLeftHeading((prev) => {
+          prev.reprioritize(buttonClicked);
+          const newH = prev;
+          return newH;
+        });
+      } else if (buttonClicked < left && buttonClicked >= parseInt(leftHeading.peek())) {
+        setLeftHeading((prev) => {
+          prev.reprioritize(buttonClicked);
+          const newH = prev;
+          return newH;
+        });
       }
       setLeftHeading((prev) => {
         prev.enqueue(buttonClicked);
@@ -178,10 +187,18 @@ const ElevatorApp = () => {
         return newH;
       }); // => this fires of the changeing of the pos and the queue
     } else if (side === 'right') {
-      if (buttonClicked > right && buttonClicked <= rightHeading.peek()) {
-        return;
-      } else if (buttonClicked < right && buttonClicked >= rightHeading.peek()) {
-        return;
+      if (buttonClicked > right && buttonClicked <= parseInt(rightHeading.peek())) {
+        setRightHeading((prev) => {
+          prev.reprioritize(buttonClicked);
+          const newH = prev;
+          return newH;
+        });
+      } else if (buttonClicked < right && buttonClicked >= parseInt(rightHeading.peek())) {
+        setRightHeading((prev) => {
+          prev.reprioritize(buttonClicked);
+          const newH = prev;
+          return newH;
+        });
       }
       setRightHeading((prev) => {
         prev.enqueue(buttonClicked);

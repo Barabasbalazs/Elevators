@@ -24,4 +24,8 @@ export class Queue {
       const unique = [...new Set(this.items)];
       return unique;
     }
+
+    reprioritize(item) {
+      this.items.unshift(item);
+    }
 }
