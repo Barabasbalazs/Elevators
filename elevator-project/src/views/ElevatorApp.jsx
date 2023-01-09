@@ -181,17 +181,13 @@ const ElevatorApp = () => {
       }
     } else if (side === 'right') {
       if (buttonClicked > right && buttonClicked <= parseInt(rightHeading.peek())) {
-        setRightHeading((prev) => {
-          prev.reprioritize(buttonClicked);
-          const newH = prev;
-          return newH;
-        });
+        const newQueue = rightHeading;
+        newQueue.reprioritize(buttonClicked);
+        setRightHeading(newQueue);
       } else if (buttonClicked < right && buttonClicked >= parseInt(rightHeading.peek())) {
-        setRightHeading((prev) => {
-          prev.reprioritize(buttonClicked);
-          const newH = prev;
-          return newH;
-        });
+        const newQueue = rightHeading;
+        newQueue.reprioritize(buttonClicked);
+        setRightHeading(newQueue);
       } else {
         const newQueue = rightHeading;
         newQueue.enqueue(buttonClicked);
@@ -199,27 +195,80 @@ const ElevatorApp = () => {
       }
     }
   } 
-  
-  const floorButtonPush = (floorCalled, direction) => {
-    // need to check if it's headed in the same direction !!!!!!
-    
-    goToClosest(floorCalled);
+
+  // ugh horrible code  
+  const floorButtonPush = async (floorCalled, direction) => {
+    if (leftHeading.isEmpty() && rightHeading.isEmpty()) {
+      goToClosest(floorCalled);
+    } else if (direction === 'down') {
+      // left is heading down
+      if (left > floorCalled && left >= (leftHeading.peek())) {
+        // destination is on the way
+        if (floorCalled >= (leftHeading.peek())) {
+          const newQueue = leftHeading;
+          newQueue.reprioritize(floorCalled);
+          setLeftHeading(newQueue);
+        } else {
+          const newQueue = leftHeading;
+          newQueue.enqueue(floorCalled);
+          setLeftHeading(newQueue);
+        }
+        // right is heading down
+      } else if (right > floorCalled && right >= (rightHeading.peek())) {
+        // destination is on the way
+        if (floorCalled >= (rightHeading.peek())) {
+          const newQueue = rightHeading;
+          newQueue.reprioritize(floorCalled);
+          setRightHeading(newQueue);
+        } else {
+          const newQueue = rightHeading;
+          newQueue.enqueue(floorCalled);
+          setRightHeading(newQueue);
+        }
+      } else {
+        goToClosest(floorCalled);
+      }
+    } else if (direction === 'up') {
+      // left is heading up from below
+      if (left < floorCalled && left <= (leftHeading.peek())) {
+        // destination on the way
+        if (floorCalled <= (leftHeading.peek())) {
+          const newQueue = leftHeading;
+          newQueue.reprioritize(floorCalled);
+          setLeftHeading(newQueue);
+        } else {
+          const newQueue = leftHeading;
+          newQueue.enqueue(floorCalled);
+          setLeftHeading(newQueue);
+        }
+        // right is heading up from below
+      } else if (right < floorCalled && right <= (rightHeading.peek())) {
+        // destination on the way
+        if (floorCalled <= (rightHeading.peek())) {
+          const newQueue = rightHeading;
+          newQueue.reprioritize(floorCalled);
+          setRightHeading(newQueue);
+        } else {
+          const newQueue = rightHeading;
+          newQueue.enqueue(floorCalled);
+          setRightHeading(newQueue);
+        }
+      } else {
+        goToClosest(floorCalled);
+      }
+    } 
   }
 
   const goToClosest = (floorCalled) => {
     const closest = calculateClosest(floorCalled);
     if (closest === 'left') {
-      setLeftHeading((prev) => {
-        prev.enqueue(floorCalled);
-        const newH = prev;
-        return newH;
-      });
+      const newQueue = leftHeading;
+      newQueue.enqueue(floorCalled);
+      setLeftHeading(newQueue);
     } else {
-      setRightHeading((prev) => {
-        prev.enqueue(floorCalled);
-        const newH = prev;
-        return newH;
-      });
+      const newQueue = rightHeading;
+      newQueue.enqueue(floorCalled);
+      setRightHeading(newQueue);
     }
   }
 

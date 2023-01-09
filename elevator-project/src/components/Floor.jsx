@@ -7,8 +7,8 @@ const Floor = (props) => {
 
     const [floors] = useState(props.floors.reverse());
 
-    const buttonClicked = (e) => {
-        props.floorCallBack(props.index, e.target.value);
+    const buttonClicked = async (e) => {
+        await props.floorCallBack(props.index, e.target.value);
     }
 
     return (
