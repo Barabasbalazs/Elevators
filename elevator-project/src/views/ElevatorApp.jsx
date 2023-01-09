@@ -62,12 +62,9 @@ const ElevatorApp = () => {
       // console.log(`left: ${left} - leftHNum ${leftHNum}`);
 
       if (left === leftHNum) {
-        // console.log('stepped into equal')
-        setLeftHeading((prev) => {
-          prev.dequeue();
-          const newQueue = prev;
-          return newQueue;  
-        });
+        const newQueue = leftHeading;
+        newQueue.dequeue();
+        setLeftHeading(newQueue);
         return;
       }
 
@@ -84,6 +81,8 @@ const ElevatorApp = () => {
   useEffect(() => {
     const interval = setInterval(() => {
 
+      // console.log(rightHeading.asList());
+
       if (rightHeading.isEmpty()) {
         return;
       }
@@ -92,11 +91,10 @@ const ElevatorApp = () => {
 
       if (right === rightHNum) {
         // console.log('stepped into equal')
-        setRightHeading((prev) => {
-          prev.dequeue();
-          const newQueue = prev;
-          return newQueue;  
-        });
+        const newQueue = rightHeading;
+        newQueue.dequeue();
+        // console.log(`New one is: ${newQueue.asList()}`);
+        setRightHeading(newQueue);
         return;
       }
 
@@ -169,23 +167,18 @@ const ElevatorApp = () => {
     // if its greater or smaller than the destination and headed in that direction it will not ad it to the queue
     if (side === 'left') {
       if (buttonClicked > left && buttonClicked <= parseInt(leftHeading.peek())) {
-        setLeftHeading((prev) => {
-          prev.reprioritize(buttonClicked);
-          const newH = prev;
-          return newH;
-        });
+        const newQueue = leftHeading;
+        newQueue.reprioritize(buttonClicked);
+        setLeftHeading(newQueue);
       } else if (buttonClicked < left && buttonClicked >= parseInt(leftHeading.peek())) {
-        setLeftHeading((prev) => {
-          prev.reprioritize(buttonClicked);
-          const newH = prev;
-          return newH;
-        });
+        const newQueue = leftHeading;
+        newQueue.reprioritize(buttonClicked);
+        setLeftHeading(newQueue);
+      } else {
+        const newQueue = leftHeading;
+        newQueue.enqueue(buttonClicked);
+        setLeftHeading(newQueue);
       }
-      setLeftHeading((prev) => {
-        prev.enqueue(buttonClicked);
-        const newH = prev;
-        return newH;
-      }); // => this fires of the changeing of the pos and the queue
     } else if (side === 'right') {
       if (buttonClicked > right && buttonClicked <= parseInt(rightHeading.peek())) {
         setRightHeading((prev) => {
@@ -199,17 +192,17 @@ const ElevatorApp = () => {
           const newH = prev;
           return newH;
         });
+      } else {
+        const newQueue = rightHeading;
+        newQueue.enqueue(buttonClicked);
+        setRightHeading(newQueue);
       }
-      setRightHeading((prev) => {
-        prev.enqueue(buttonClicked);
-        const newH = prev;
-        return newH;
-      });
     }
   } 
   
   const floorButtonPush = (floorCalled, direction) => {
     // need to check if it's headed in the same direction !!!!!!
+    
     goToClosest(floorCalled);
   }
 

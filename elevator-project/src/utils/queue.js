@@ -26,6 +26,6 @@ export class Queue {
     }
 
     reprioritize(item) {
-      this.items.unshift(item);
+      return this.items.unshift(item);
     }
 }
