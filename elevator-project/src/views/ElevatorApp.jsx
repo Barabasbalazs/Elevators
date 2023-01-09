@@ -5,20 +5,21 @@ import { Queue } from '../utils/queue'
 
 const ElevatorApp = () => {
 
+  const [floorNumbers] = useState(import.meta.env.VITE_NUM_FLOORS);
+
   const [floors, setFloors] = useState()
 
   const [floorStates, setFloorStates] = useState()
 
-  const [left, setLeftElevator] = useState(0)
+  const [left, setLeftElevator] = useState()
 
-  const [right, setRightElevator] = useState(6)
+  const [right, setRightElevator] = useState()
 
   const [leftHeading, setLeftHeading] = useState(new Queue());
 
   const [rightHeading, setRightHeading] = useState(new Queue());
 
   useEffect(() => {
-    const floorNumbers = import.meta.env.VITE_NUM_FLOORS;
 
     const floorArray = Array.from({length: floorNumbers}, (x, i) => i);
 
@@ -26,7 +27,7 @@ const ElevatorApp = () => {
       if (ind === 0) {
         return {
           left: true,
-          right: false
+          right: false,
         }
       } else if (ind === (floorNumbers - 1)) {
         return {
@@ -43,22 +44,25 @@ const ElevatorApp = () => {
 
     setFloors(floorArray.reverse(), setFloorStates(tmpFloorStates));
 
+    setLeftElevator(0);
+    setRightElevator(floorNumbers - 1);
+
   }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
 
       if (leftHeading.isEmpty()) {
-        console.log('it is empty')
+        // console.log('it is empty')
         return;
       }
 
       const leftHNum = parseInt(leftHeading.peek());
 
-      console.log(`left: ${left} - leftHNum ${leftHNum}`);
+      // console.log(`left: ${left} - leftHNum ${leftHNum}`);
 
       if (left === leftHNum) {
-        console.log('stepped into equal')
+        // console.log('stepped into equal')
         setLeftHeading((prev) => {
           prev.dequeue();
           const newQueue = prev;
@@ -160,36 +164,25 @@ const ElevatorApp = () => {
     }
   }
 
-  const leftPeekAndInsert = (floorCalled) => {
-    setLeftHeading((prev) => {
-      const head = leftHeading.peek();
-      prev.dequeue();
-      prev.enqueue(floorCalled);
-      prev.enqueue(head);
-      const newH = prev;
-      return newH;
-    });
-  }
-
-  const rightPeekAndInsert = (floorCalled) => {
-    setRightHeading((prev) => {
-      const head = leftHeading.peek();
-      prev.dequeue();
-      prev.enqueue(floorCalled);
-      prev.enqueue(head);
-      const newH = prev;
-      return newH;
-    });
-  }
-
   const elavatorButtonPush = async (side, buttonClicked) => {
+    // if its greater or smaller than the destination and headed in that direction it will not ad it to the queue
     if (side === 'left') {
+      if (buttonClicked > left && buttonClicked <= leftHeading.peek()) {
+        return;
+      } else if (buttonClicked < left && buttonClicked >= leftHeading.peek()) {
+        return;
+      }
       setLeftHeading((prev) => {
         prev.enqueue(buttonClicked);
         const newH = prev;
         return newH;
       }); // => this fires of the changeing of the pos and the queue
     } else if (side === 'right') {
+      if (buttonClicked > right && buttonClicked <= rightHeading.peek()) {
+        return;
+      } else if (buttonClicked < right && buttonClicked >= rightHeading.peek()) {
+        return;
+      }
       setRightHeading((prev) => {
         prev.enqueue(buttonClicked);
         const newH = prev;
@@ -199,6 +192,7 @@ const ElevatorApp = () => {
   } 
   
   const floorButtonPush = (floorCalled, direction) => {
+    // need to check if it's headed in the same direction !!!!!!
     goToClosest(floorCalled);
   }
 
@@ -231,7 +225,9 @@ const ElevatorApp = () => {
             </div>
             <div className="flex space-x-2">
               <p>Heading To:</p>
-              <p>{leftHeading.peek()}</p>
+              { leftHeading.asList().map((el) => {
+                return <p>{el}</p>
+              })}
             </div>
           </div>  
           <div>
@@ -241,7 +237,9 @@ const ElevatorApp = () => {
             </div>
             <div className="flex space-x-2">
               <p>Heading To:</p>
-              <p>{rightHeading.peek()}</p>
+              { rightHeading.asList().map((el) => {
+                return <p>{el}</p>
+              })}
             </div>
           </div>
         </div>
@@ -249,10 +247,10 @@ const ElevatorApp = () => {
             return <Floor 
                     index={index}
                     floors={floors}
-                    key={index}
                     elevatorCallBack={elavatorButtonPush}
                     floorCallBack={floorButtonPush}
                     floorSituation={floorStates[index]}
+                    max={parseInt(floorNumbers)}
                     />; }
         )}
       </div>

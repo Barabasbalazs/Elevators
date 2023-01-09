@@ -18,4 +18,10 @@ export class Queue {
     isEmpty() {
       return this.items.length === 0;
     }
+
+    asList() {
+      // filter out all duplicates added from useState
+      const unique = [...new Set(this.items)];
+      return unique;
+    }
 }

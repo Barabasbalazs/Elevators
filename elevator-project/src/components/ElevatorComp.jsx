@@ -21,7 +21,7 @@ ElevatorComp.propTypes = {
     currentFloor: PropTypes.number,
     buttonClickCallback: PropTypes.func,
     side: PropTypes.string,
-    floors: PropTypes.arrayOf(PropTypes.number)
+    floors: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default ElevatorComp
