@@ -9,42 +9,6 @@ const ElevatorApp = () => {
 
   const [floorStates, setFloorStates] = useState()
 
-  /*
-  const [floors] = useState([6, 5, 4, 3, 2, 1, 0])
-
-  const [floorStates, setFloorStates] = useState([
-    {
-      left: true,
-      right: false,
-    },
-    {
-      left: false,
-      right: false,
-    },
-    {
-      left: false,
-      right: false,
-    },
-    {
-      left: false,
-      right: false,
-    },
-    {
-      left: false,
-      right: false,
-    },
-    {
-      left: false,
-      right: false,
-    },
-    {
-      left: false,
-      right: true,
-    }
-  ])
-
-  */
-
   const [left, setLeftElevator] = useState(0)
 
   const [right, setRightElevator] = useState(6)
@@ -56,11 +20,7 @@ const ElevatorApp = () => {
   useEffect(() => {
     const floorNumbers = import.meta.env.VITE_NUM_FLOORS;
 
-    // console.log(`fired: ${floorNumbers}`);
-
-    const floorArray = Array.from(Array(floorNumbers).keys());
-
-    // console.log(floorArray);
+    const floorArray = Array.from({length: floorNumbers}, (x, i) => i);
 
     const tmpFloorStates = floorArray.map((ind) => {
       if (ind === 0) {
@@ -82,9 +42,6 @@ const ElevatorApp = () => {
     });
 
     setFloors(floorArray.reverse(), setFloorStates(tmpFloorStates));
-
-    // console.log(floors);
-
 
   }, []);
 
