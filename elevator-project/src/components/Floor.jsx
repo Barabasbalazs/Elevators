@@ -21,25 +21,23 @@ const Floor = (props) => {
                 <Button value={'up'} onClick={buttonClicked}>Up</Button>
                 <Button value={'down'} onClick={buttonClicked}>Down</Button>
             </div>
-            <div className="h-full w-full">
+            <div className="w-full border-r-4">
             {props.floorSituation.left && 
                 <ElevatorComp 
                     floors={floors} 
                     side={'left'}
                     currentFloor={props.index}
                     buttonClickCallback={props.elevatorCallBack}
-                    list={props.floorSituation.headingToLeft}
                 />    
             }
             </div>
-            <div className="h-full w-full border-l-4">
+            <div className="w-full border-l-4">
             {props.floorSituation.right && 
                  <ElevatorComp 
                     floors={floors} 
                     side={'right'}
                     currentFloor={props.index}
                     buttonClickCallback={props.elevatorCallBack}
-                    list={props.floorSituation.headingToRight}
                  />
             }
             </div>

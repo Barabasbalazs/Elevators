@@ -5,13 +5,17 @@ import { Queue } from '../utils/queue'
 
 const ElevatorApp = () => {
 
+  const [floors, setFloors] = useState()
+
+  const [floorStates, setFloorStates] = useState()
+
+  /*
   const [floors] = useState([6, 5, 4, 3, 2, 1, 0])
 
   const [floorStates, setFloorStates] = useState([
     {
       left: true,
       right: false,
-      headingToLeft: new Queue()
     },
     {
       left: false,
@@ -36,9 +40,10 @@ const ElevatorApp = () => {
     {
       left: false,
       right: true,
-      headingToRight: new Queue()
     }
   ])
+
+  */
 
   const [left, setLeftElevator] = useState(0)
 
@@ -47,6 +52,41 @@ const ElevatorApp = () => {
   const [leftHeading, setLeftHeading] = useState(new Queue());
 
   const [rightHeading, setRightHeading] = useState(new Queue());
+
+  useEffect(() => {
+    const floorNumbers = import.meta.env.VITE_NUM_FLOORS;
+
+    // console.log(`fired: ${floorNumbers}`);
+
+    const floorArray = Array.from(Array(floorNumbers).keys());
+
+    // console.log(floorArray);
+
+    const tmpFloorStates = floorArray.map((ind) => {
+      if (ind === 0) {
+        return {
+          left: true,
+          right: false
+        }
+      } else if (ind === (floorNumbers - 1)) {
+        return {
+          left: false,
+          right: true,
+        }
+      } else {
+        return {
+          left: false,
+          right: false
+        }
+      }
+    });
+
+    setFloors(floorArray.reverse(), setFloorStates(tmpFloorStates));
+
+    // console.log(floors);
+
+
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -117,14 +157,11 @@ const ElevatorApp = () => {
         if (ind === parseInt(destFloor)) {
           return {
             left: true,
-            headingToLeft: leftHeading,
-            headingToRight: el.headingToRight,
             right: el.right
           }
         } else {
           return {
             left: false,
-            headingToRight: el.headingToRight,
             right: el.right
           }
         }
@@ -139,14 +176,11 @@ const ElevatorApp = () => {
         if (ind === parseInt(destFloor)) {
           return {
             right: true,
-            headingToLeft: el.headingToLeft,
-            headingToRight: rightHeading,
             left: el.left
           }
         } else {
           return {
             right: false,
-            headingToLeft: el.headingToLeft,
             left: el.left
           }
         }
@@ -156,17 +190,39 @@ const ElevatorApp = () => {
   }
   
   const calculateClosest = (floorNumber) => {
-    if (Math.abs(left.pos - floorNumber) < Math.abs(right.pos - floorNumber)) {
+    if (Math.abs(left - floorNumber) < Math.abs(right - floorNumber)) {
       return 'left';
-    } else if (Math.abs(left.pos - floorNumber) > Math.abs(right.pos - floorNumber)) {
+    } else if (Math.abs(left - floorNumber) > Math.abs(right - floorNumber)) {
       return 'right';
-    } else if (Math.abs(left.pos - floorNumber) > Math.abs(right.pos - floorNumber)) {
-      if (left.pos < floorNumber) {
+    } else if (Math.abs(left - floorNumber) === Math.abs(right - floorNumber)) {
+      if (left <= right) {
         return 'left';
-      } else if (right.pos < floorNumber) {
+      } else if (left > right) {
         return 'right';
       }
     }
+  }
+
+  const leftPeekAndInsert = (floorCalled) => {
+    setLeftHeading((prev) => {
+      const head = leftHeading.peek();
+      prev.dequeue();
+      prev.enqueue(floorCalled);
+      prev.enqueue(head);
+      const newH = prev;
+      return newH;
+    });
+  }
+
+  const rightPeekAndInsert = (floorCalled) => {
+    setRightHeading((prev) => {
+      const head = leftHeading.peek();
+      prev.dequeue();
+      prev.enqueue(floorCalled);
+      prev.enqueue(head);
+      const newH = prev;
+      return newH;
+    });
   }
 
   const elavatorButtonPush = async (side, buttonClicked) => {
@@ -185,14 +241,54 @@ const ElevatorApp = () => {
     }
   } 
   
-  const floorButtonPush = () => {
-    console.log('Floorbuttonpush');
+  const floorButtonPush = (floorCalled, direction) => {
+    goToClosest(floorCalled);
+  }
+
+  const goToClosest = (floorCalled) => {
+    const closest = calculateClosest(floorCalled);
+    if (closest === 'left') {
+      setLeftHeading((prev) => {
+        prev.enqueue(floorCalled);
+        const newH = prev;
+        return newH;
+      });
+    } else {
+      setRightHeading((prev) => {
+        prev.enqueue(floorCalled);
+        const newH = prev;
+        return newH;
+      });
+    }
   }
 
   return (
     <div className="flex justify-center">
-      <div className="w-full h-screen">
-        {floors.map((index) => {
+      <div className="w-full h-fit">
+        <div className="text-left grid grid-cols-3 divide-x items-center border-t-4 space-x-2">
+          <div></div>
+          <div>
+            <div className="flex space-x-2">
+              <p>First Elevator:</p>
+              <p>{left}</p>
+            </div>
+            <div className="flex space-x-2">
+              <p>Heading To:</p>
+              <p>{leftHeading.peek()}</p>
+            </div>
+          </div>  
+          <div>
+            <div className="flex space-x-2">
+              <p>Second Elevator:</p>
+              <p>{right}</p>
+            </div>
+            <div className="flex space-x-2">
+              <p>Heading To:</p>
+              <p>{rightHeading.peek()}</p>
+            </div>
+          </div>
+        </div>
+        {floorStates && floors.map((index) => {
             return <Floor 
                     index={index}
                     floors={floors}
